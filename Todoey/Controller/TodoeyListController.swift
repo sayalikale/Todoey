@@ -9,37 +9,43 @@
 import UIKit
 
 class TodoeyListController: UITableViewController{
-   
-     var todoArray = [String]()
     
+    var todoArray = [String]()
+    var userdefault = UserDefaults.standard
     @IBOutlet var TodoTableView: UITableView!
     override func viewDidLoad() {
         super.viewDidLoad()
-       tableView.separatorColor = UIColor.red
+        //use userdefoult
+       
+      if  let todoArrayval = userdefault.array(forKey: "TodolistArray") as? [String]
+      {
+        todoArray = todoArrayval
+      }
+        tableView.separatorColor = UIColor.red
         
-      // tableView.allowsMultipleSelectionDuringEditing = true
+        // tableView.allowsMultipleSelectionDuringEditing = true
         
         tableView.dataSource = self
         tableView.delegate = self
         tableView.tableFooterView = UIView()
-       
+        
     }
-
+    
     //Mark : table view datasource
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return todoArray.count
     }
-   
+    
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoCell", for: indexPath)
         
         cell.textLabel?.text = todoArray[indexPath.row]
-       // cell.textLabel?.text = todomodel.itemName[]
+        // cell.textLabel?.text = todomodel.itemName[]
         
         return cell
-       
+        
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -72,9 +78,13 @@ class TodoeyListController: UITableViewController{
             }
             else
             {
-                var todomodel = TodoItemModel()
-                todomodel.itemName = textfiled.text!
-                self.todoArray.append(todomodel.itemName)
+//                let todomodel = TodoItemModel()
+//                todomodel.itemName = textfiled.text!
+                
+                //userdefoult save val
+                
+                self.todoArray.append(textfiled.text!)
+                self.userdefault.set(self.todoArray, forKey: "TodolistArray")
                 self.tableView.reloadData()
             }
         }
@@ -84,12 +94,12 @@ class TodoeyListController: UITableViewController{
             textfiled = text
         }
         
-        var actio  = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        let actio  = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         alert.addAction(actio)
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
     }
     
-   
+    
 }
 
