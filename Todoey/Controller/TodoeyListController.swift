@@ -10,8 +10,8 @@ import UIKit
 
 class TodoeyListController: UITableViewController{
    
-     var todoArray = ["study", "interview", "get job", "party"]
-     var temp = [String]()
+     var todoArray = [String]()
+    
     @IBOutlet var TodoTableView: UITableView!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,6 +36,7 @@ class TodoeyListController: UITableViewController{
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoCell", for: indexPath)
         
         cell.textLabel?.text = todoArray[indexPath.row]
+       // cell.textLabel?.text = todomodel.itemName[]
         
         return cell
        
@@ -54,9 +55,41 @@ class TodoeyListController: UITableViewController{
         
     }
     
-//    override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
-//          tableView.cellForRow(at: indexPath as IndexPath)?.accessoryType = .none
-//    }
+    @IBAction func addBtnClicked(_ sender: UIBarButtonItem) {
+        var textfiled = UITextField()
+        let alert = UIAlertController(title: "Add item", message: "Add new item in your todo list", preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "Add", style: .default) { (newitemtext) in
+            print("item \(textfiled.text ?? "")")
+            if textfiled.text == "" as String?
+            {
+                let alert = UIAlertController(title: "Add item", message: "please write a item name", preferredStyle: .alert)
+                
+                let actio  = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+                alert.addAction(actio)
+                
+                self.present(alert, animated: true, completion: nil)
+            }
+            else
+            {
+                var todomodel = TodoItemModel()
+                todomodel.itemName = textfiled.text!
+                self.todoArray.append(todomodel.itemName)
+                self.tableView.reloadData()
+            }
+        }
+        
+        alert.addTextField { (text) in
+            text.placeholder = "add new item"
+            textfiled = text
+        }
+        
+        var actio  = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        alert.addAction(actio)
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+    }
+    
    
 }
 
