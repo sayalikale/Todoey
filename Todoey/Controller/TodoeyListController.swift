@@ -118,7 +118,9 @@ class TodoeyListController: UITableViewController{
         }
     }
     @IBAction func addBtnClicked(_ sender: UIBarButtonItem) {
+        
         var textfiled = UITextField()
+        TodoSearchbar.endEditing(true)
         let alert = UIAlertController(title: "Add item", message: "Add new item in your todo list", preferredStyle: .alert)
         
         let action = UIAlertAction(title: "Add", style: .default) { (newitemtext) in
@@ -139,6 +141,8 @@ class TodoeyListController: UITableViewController{
                 newItem.done = false
                 newItem.parentCategory = self.selectedCategory
                 self.todoArray.append(newItem)
+                self.searchActive = false;
+                print("searchActive \(self.searchActive)")
                 self.tableView.reloadData()
                 self.saveData()
             }
