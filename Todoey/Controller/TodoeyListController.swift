@@ -7,22 +7,23 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 class TodoeyListController: UITableViewController{
     
     //selected particular catagiry
+    var realm = try! Realm()
     var selectedCategory : Category?
     {
         didSet {
             
-            loadData(wherefrom: true)
+            loadData()
         }
     }
     @IBOutlet var TodoSearchbar: UISearchBar!
     var searchActive : Bool = false
-    var filtered:[Item] = []
+    var filtered:Results<Item>?
     
-    var todoArray = [Item]()
+    var todoArray  : Results<Item>?
     var userdefault = UserDefaults.standard
     @IBOutlet var TodoTableView: UITableView!
     
@@ -51,9 +52,9 @@ class TodoeyListController: UITableViewController{
     //Mark : table view datasource
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if(searchActive) {
-            return filtered.count
+            return filtered?.count ?? 1
         }
-        return todoArray.count
+        return todoArray?.count ?? 1
     }
     
     
@@ -61,11 +62,11 @@ class TodoeyListController: UITableViewController{
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoCell", for: indexPath)
         if(searchActive){
-            cell.textLabel?.text = filtered[indexPath.row].title;
-            cell.accessoryType = filtered[indexPath.row].done == true ? .checkmark : .none
+            cell.textLabel?.text = filtered?[indexPath.row].title ?? "Not found";
+            cell.accessoryType = filtered?[indexPath.row].done == true ? .checkmark : .none
         } else {
-            cell.textLabel?.text = todoArray[indexPath.row].title;
-            cell.accessoryType = todoArray[indexPath.row].done == true ? .checkmark : .none
+            cell.textLabel?.text = todoArray?[indexPath.row].title ?? "no item added yet";
+            cell.accessoryType = todoArray?[indexPath.row].done == true ? .checkmark : .none
         }
         
         
@@ -76,12 +77,53 @@ class TodoeyListController: UITableViewController{
         if let cell = tableView.cellForRow(at: indexPath as IndexPath) {
             print("row \(indexPath.row)")
             
+            if let item = todoArray?[indexPath.row]
+            {
+                do
+                {
+                    try realm.write {
+                        item.done = !item.done
+                    }
+                }
+                catch
+                {
+                    print(error)
+                }
+            }
+            tableView.reloadData()
+            
             if(!searchActive){
-                todoArray[indexPath.row].done = !todoArray[indexPath.row].done
+                if let item = todoArray?[indexPath.row]
+                {
+                    do
+                    {
+                        try realm.write {
+                            item.done = !item.done
+                        }
+                    }
+                    catch
+                    {
+                        print(error)
+                    }
+                }
+                
             }
             else
             {
-                filtered[indexPath.row].done = !filtered[indexPath.row].done
+                if let item = filtered?[indexPath.row]
+                {
+                    do
+                    {
+                        try realm.write {
+                            item.done = !item.done
+                        }
+                    }
+                    catch
+                    {
+                        print(error)
+                    }
+                }
+                
             }
             if cell.accessoryType == .checkmark{
                 cell.accessoryType = .none
@@ -89,7 +131,8 @@ class TodoeyListController: UITableViewController{
             else{
                 cell.accessoryType = .checkmark
             }
-            saveData()
+            tableView.reloadData()
+            // }
         }
     }
     
@@ -102,14 +145,28 @@ class TodoeyListController: UITableViewController{
             
             // remove the item from the data model
             if(!searchActive){
-            context.delete(todoArray[indexPath.row])
-            todoArray.remove(at: indexPath.row)
+                do{
+                    try realm.write {
+                        realm.delete(todoArray![indexPath.row])
+                    }
+                }
+                catch
+                {
+                    print(error)
+                }
             }else{
-                context.delete(filtered[indexPath.row])
-                filtered.remove(at: indexPath.row)
+                do{
+                    try realm.write {
+                        realm.delete(filtered![indexPath.row])
+                    }
+                }
+                catch
+                {
+                    print(error)
+                }
             }
-            saveData()
-                
+            // saveData()
+            
             // delete the table view row
             tableView.deleteRows(at: [indexPath], with: .fade)
             
@@ -136,15 +193,29 @@ class TodoeyListController: UITableViewController{
             }
             else
             {
-                let newItem = Item(context: self.context)
-                newItem.title = textfiled.text
-                newItem.done = false
-                newItem.parentCategory = self.selectedCategory
-                self.todoArray.append(newItem)
+                
+                if let curentitem = self.selectedCategory
+                {
+                    do
+                    {
+                        try self.realm.write() {
+                            let newItem = Item()
+                            newItem.title = textfiled.text!
+                            newItem.done = false
+                            curentitem.item.append(newItem)
+                        }
+                    }
+                    catch
+                    {
+                        print(error)
+                    }
+                }
                 self.searchActive = false;
                 print("searchActive \(self.searchActive)")
                 self.tableView.reloadData()
-                self.saveData()
+                
+                
+                
             }
         }
         alert.addTextField { (text) in
@@ -158,49 +229,23 @@ class TodoeyListController: UITableViewController{
     }
     
     //save data to our own plist we have to encode the data
-    func saveData() {
-        
-        do
-        {
-            try context.save()
-        }catch
-        {
-            print(error)
-        }
-        
-    }
+    //    func save(item : Item) {
+    //
+    //        do
+    //        {
+    //            try realm.write() {
+    //                todoArray = realm.add(item)
+    //            }
+    //        }catch
+    //        {
+    //            print(error)
+    //        }
+    //
+    //    }
     
-    func loadData(with request : NSFetchRequest<Item> = Item.fetchRequest(), predicate : NSPredicate? = nil, wherefrom : Bool) {
+    func loadData() {
         
-        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", (selectedCategory?.name)!)
-        
-        if let additionalCategory = predicate
-        {
-            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [additionalCategory, categoryPredicate])
-        }
-        else
-        {
-            request.predicate = categoryPredicate
-        }
-        
-        do
-        {
-            if (wherefrom == true)
-            {
-                todoArray = try context.fetch(request)
-            }
-            else
-            {
-                filtered = try context.fetch(request)
-            }
-            for item in todoArray
-            {
-                print("item \(item)")
-            }
-        }catch
-        {
-            print("error in feching the data \(error)")
-        }
+        todoArray = selectedCategory?.item.sorted(byKeyPath: "title", ascending: true)
         tableView.reloadData()
     }
 }
@@ -239,10 +284,7 @@ extension TodoeyListController : UISearchBarDelegate
             }
         }
         // TodoSearchbar.showsCancelButton = true
-        let request : NSFetchRequest<Item> = Item.fetchRequest()
-        let predicate = NSPredicate(format: "title contains[cd] %@", searchBar.text!)
-        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-        loadData(with: request,predicate: predicate, wherefrom: false)
+        filtered = todoArray?.filter("title CONTAINS[cd] %@", searchBar.text).sorted(byKeyPath: "title", ascending: true)
         self.tableView.reloadData()
     }
     

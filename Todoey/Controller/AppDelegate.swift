@@ -19,19 +19,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         print(Realm.Configuration.defaultConfiguration.fileURL!)
         
-        let datarealm = DataRel()
-        datarealm.Name = "sriram"
-        datarealm.age = 31
-        
-        do{
-            let realm = try Realm()
-            try realm.write {
-                realm.add(datarealm)
-            }
-        }catch
-        {
-            print("error in realm \(error)")
-        }
+//        let datarealm = DataRel()
+//        datarealm.Name = "sriram"
+//        datarealm.age = 31
+//        
+//        do{
+//            let realm = try Realm()
+//            try realm.write {
+//                realm.add(datarealm)
+//            }
+//        }catch
+//        {
+//            print("error in realm \(error)")
+//        }
         
         // Override point for customization after application launch.
         return true
