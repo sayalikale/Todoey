@@ -10,6 +10,7 @@
 		2D4D37496647C38BC3412FAD /* Pods_Todoey.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1348F511FFE4C395EE260CC8 /* Pods_Todoey.framework */; };
 		D202210E23E0B5930015726D /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = D202210D23E0B5930015726D /* Item.swift */; };
 		D202211023E0B5A60015726D /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = D202210F23E0B5A60015726D /* Category.swift */; };
+		D202211423E20DD90015726D /* SwipeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D202211323E20DD90015726D /* SwipeTableViewController.swift */; };
 		D227FBE723A80D3D00D5E102 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D227FBE623A80D3D00D5E102 /* AppDelegate.swift */; };
 		D227FBE923A80D3D00D5E102 /* TodoeyListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D227FBE823A80D3D00D5E102 /* TodoeyListController.swift */; };
 		D227FBEC23A80D3D00D5E102 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D227FBEA23A80D3D00D5E102 /* Main.storyboard */; };
@@ -24,6 +25,7 @@
 		13A2468F1E7343CDE58EF351 /* Pods-Todoey.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Todoey.release.xcconfig"; path = "Pods/Target Support Files/Pods-Todoey/Pods-Todoey.release.xcconfig"; sourceTree = "<group>"; };
 		D202210D23E0B5930015726D /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		D202210F23E0B5A60015726D /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
+		D202211323E20DD90015726D /* SwipeTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeTableViewController.swift; sourceTree = "<group>"; };
 		D227FBE323A80D3D00D5E102 /* Todoey.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Todoey.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D227FBE623A80D3D00D5E102 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D227FBE823A80D3D00D5E102 /* TodoeyListController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoeyListController.swift; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 				D227FBE623A80D3D00D5E102 /* AppDelegate.swift */,
 				D227FBE823A80D3D00D5E102 /* TodoeyListController.swift */,
 				D227FC2123AC43B100D5E102 /* CategoryViewController.swift */,
+				D202211323E20DD90015726D /* SwipeTableViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -218,13 +221,17 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-Todoey/Pods-Todoey-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/ChameleonFramework/ChameleonFramework.framework",
 				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
 				"${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/SwipeCellKit/SwipeCellKit.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ChameleonFramework.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RealmSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwipeCellKit.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -241,6 +248,7 @@
 				D202211023E0B5A60015726D /* Category.swift in Sources */,
 				D227FC2223AC43B100D5E102 /* CategoryViewController.swift in Sources */,
 				D227FBE923A80D3D00D5E102 /* TodoeyListController.swift in Sources */,
+				D202211423E20DD90015726D /* SwipeTableViewController.swift in Sources */,
 				D227FBE723A80D3D00D5E102 /* AppDelegate.swift in Sources */,
 				D202210E23E0B5930015726D /* Item.swift in Sources */,
 				D227FBFC23A833A700D5E102 /* TodoItemModel.swift in Sources */,

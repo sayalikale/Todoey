@@ -8,7 +8,9 @@
 
 import UIKit
 import RealmSwift
-class TodoeyListController: UITableViewController{
+import SwipeCellKit
+
+class TodoeyListController: SwipeTableViewController {
     
     //selected particular catagiry
     var realm = try! Realm()
@@ -35,7 +37,7 @@ class TodoeyListController: UITableViewController{
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+          tableView.rowHeight = 80
         //   let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
         print("\(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))\n\n\n")
         tableView.separatorColor = UIColor.red
@@ -60,7 +62,8 @@ class TodoeyListController: UITableViewController{
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TodoCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
+      
         if(searchActive){
             cell.textLabel?.text = filtered?[indexPath.row].title ?? "Not found";
             cell.accessoryType = filtered?[indexPath.row].done == true ? .checkmark : .none
@@ -69,7 +72,6 @@ class TodoeyListController: UITableViewController{
             cell.accessoryType = todoArray?[indexPath.row].done == true ? .checkmark : .none
         }
         
-        
         return cell
     }
     
@@ -77,21 +79,7 @@ class TodoeyListController: UITableViewController{
         if let cell = tableView.cellForRow(at: indexPath as IndexPath) {
             print("row \(indexPath.row)")
             
-            if let item = todoArray?[indexPath.row]
-            {
-                do
-                {
-                    try realm.write {
-                        item.done = !item.done
-                    }
-                }
-                catch
-                {
-                    print(error)
-                }
-            }
-            tableView.reloadData()
-            
+          
             if(!searchActive){
                 if let item = todoArray?[indexPath.row]
                 {
@@ -106,9 +94,9 @@ class TodoeyListController: UITableViewController{
                         print(error)
                     }
                 }
-                
+
             }
-            else
+           if(searchActive)
             {
                 if let item = filtered?[indexPath.row]
                 {
@@ -123,57 +111,78 @@ class TodoeyListController: UITableViewController{
                         print(error)
                     }
                 }
-                
+
             }
-            if cell.accessoryType == .checkmark{
-                cell.accessoryType = .none
-            }
-            else{
-                cell.accessoryType = .checkmark
-            }
+
             tableView.reloadData()
-            // }
+            
         }
     }
+        
+        override func update(at indexpath: IndexPath) {
+            if(!searchActive){
+                do{
+                    try realm.write {
+                        realm.delete(todoArray![indexpath.row])
+                    }
+                }
+                catch
+                {
+                    print(error)
+                }
+            }
+            else{
+                do{
+                    try realm.write {
+                        realm.delete(filtered![indexpath.row])
+                    }
+                }
+                catch
+                {
+                    print(error)
+                }
+            }
+        }
+    
     
     //delete row
     
     // this method handles row deletion
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        
-        if editingStyle == .delete {
-            
-            // remove the item from the data model
-            if(!searchActive){
-                do{
-                    try realm.write {
-                        realm.delete(todoArray![indexPath.row])
-                    }
-                }
-                catch
-                {
-                    print(error)
-                }
-            }else{
-                do{
-                    try realm.write {
-                        realm.delete(filtered![indexPath.row])
-                    }
-                }
-                catch
-                {
-                    print(error)
-                }
-            }
-            // saveData()
-            
-            // delete the table view row
-            tableView.deleteRows(at: [indexPath], with: .fade)
-            
-        } else if editingStyle == .insert {
-            // Not used in our example, but if you were adding a new row, this is where you would do it.
-        }
-    }
+//    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+//
+//        if editingStyle == .delete {
+//
+//            // remove the item from the data model
+//            if(!searchActive){
+//                do{
+//                    try realm.write {
+//                        realm.delete(todoArray![indexPath.row])
+//                    }
+//                }
+//                catch
+//                {
+//                    print(error)
+//                }
+//            }else{
+//                do{
+//                    try realm.write {
+//                        realm.delete(filtered![indexPath.row])
+//                    }
+//                }
+//                catch
+//                {
+//                    print(error)
+//                }
+//            }
+//            // saveData()
+//
+//            // delete the table view row
+//            tableView.deleteRows(at: [indexPath], with: .fade)
+//
+//        } else if editingStyle == .insert {
+//            // Not used in our example, but if you were adding a new row, this is where you would do it.
+//        }
+//    }
     @IBAction func addBtnClicked(_ sender: UIBarButtonItem) {
         
         var textfiled = UITextField()
@@ -228,20 +237,6 @@ class TodoeyListController: UITableViewController{
         present(alert, animated: true, completion: nil)
     }
     
-    //save data to our own plist we have to encode the data
-    //    func save(item : Item) {
-    //
-    //        do
-    //        {
-    //            try realm.write() {
-    //                todoArray = realm.add(item)
-    //            }
-    //        }catch
-    //        {
-    //            print(error)
-    //        }
-    //
-    //    }
     
     func loadData() {
         
@@ -261,6 +256,7 @@ extension TodoeyListController : UISearchBarDelegate
     
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
         searchActive = false;
+      
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
@@ -287,5 +283,7 @@ extension TodoeyListController : UISearchBarDelegate
         filtered = todoArray?.filter("title CONTAINS[cd] %@", searchBar.text).sorted(byKeyPath: "title", ascending: true)
         self.tableView.reloadData()
     }
+    
+    
     
 }

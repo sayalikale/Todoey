@@ -8,9 +8,9 @@
 
 import UIKit
 import RealmSwift
+import SwipeCellKit
 
-
-class CategoryViewController: UITableViewController {
+class CategoryViewController: SwipeTableViewController {
     
     let realm = try! Realm()
     
@@ -19,6 +19,7 @@ class CategoryViewController: UITableViewController {
     var context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.rowHeight = 80
         upload()
         
     }
@@ -31,9 +32,10 @@ class CategoryViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "maincell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
+        
         cell.textLabel?.text = mainItemArr?[indexPath.row].name ?? "no category added"
-        // savemainData()
+        
         return cell
     }
     
@@ -43,6 +45,20 @@ class CategoryViewController: UITableViewController {
             performSegue(withIdentifier: "goToToDoList", sender: self)
         }
     }
+    
+    
+    override func update(at indexpath : IndexPath)
+    {
+        do{
+            try self.realm.write {
+                self.realm.delete(self.mainItemArr![indexpath.row])
+            }
+        }catch
+        {
+            print(error)
+        }
+    }
+    
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let todolistVC = segue.destination as! TodoeyListController
@@ -55,19 +71,7 @@ class CategoryViewController: UITableViewController {
     // this method handles row deletion
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         
-        //        if editingStyle == .delete {
-        //
-        //            // remove the item from the data model
-        //
-        //           // context.delete(mainItemArr[indexPath.row])
-        //            mainItemArr.remove(at: indexPath.row)
-        //            //   saveData()
-        //            // delete the table view row
-        //            tableView.deleteRows(at: [indexPath], with: .fade)
-        //
-        //        } else if editingStyle == .insert {
-        //            // Not used in our example, but if you were adding a new row, this is where you would do it.
-        //        }
+        
     }
     
     
@@ -90,6 +94,7 @@ class CategoryViewController: UITableViewController {
         alert.addAction(add)
         alert.addAction(cancel)
         present(alert, animated: true, completion: nil)
+        tableView.reloadData()
         
         
     }
@@ -106,6 +111,8 @@ class CategoryViewController: UITableViewController {
         {
             print("error in save data \(error)")
         }
+        
+        tableView.reloadData()
     }
     
     // fetch/read data from database by using coredata
@@ -114,3 +121,7 @@ class CategoryViewController: UITableViewController {
         mainItemArr = realm.objects(Category.self)
     }
 }
+
+
+
+
