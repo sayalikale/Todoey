@@ -9,6 +9,7 @@
 import UIKit
 import RealmSwift
 import SwipeCellKit
+import ChameleonFramework
 
 class CategoryViewController: SwipeTableViewController {
     
@@ -16,9 +17,10 @@ class CategoryViewController: SwipeTableViewController {
     
     //var data : Results<Category>!
     var mainItemArr : Results<Category>?
-    var context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+  
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.separatorStyle = .none
         tableView.rowHeight = 80
         upload()
         
@@ -33,11 +35,26 @@ class CategoryViewController: SwipeTableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
-        
+    
+        cell.backgroundColor = UIColor(hexString: (mainItemArr?[indexPath.row].randomColour)!)
         cell.textLabel?.text = mainItemArr?[indexPath.row].name ?? "no category added"
-        
+        cell.textLabel?.textColor = ContrastColorOf(UIColor(hexString: (mainItemArr?[indexPath.row].randomColour)!)!, returnFlat: true)
         return cell
     }
+    
+    //colour
+    func getColor(_ name: String) -> UIColor? {
+        let selector = Selector("\(name)Color")
+        if UIColor.self.responds(to: selector) {
+            let color = UIColor.self.perform(selector).takeUnretainedValue()
+            return (color as! UIColor)
+        } else {
+            return nil
+        }
+    }
+//
+    
+    
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if tableView.cellForRow(at: indexPath as IndexPath) != nil {
@@ -83,6 +100,7 @@ class CategoryViewController: SwipeTableViewController {
         let add = UIAlertAction(title: "Add", style: .default) { (text) in
             let newItem = Category()
             newItem.name = textfield.text!
+            newItem.randomColour = UIColor.randomFlat.hexValue()
             //  self.mainItemArr(newItem)
             self.tableView.reloadData()
             self.save(category: newItem)
@@ -120,6 +138,7 @@ class CategoryViewController: SwipeTableViewController {
     func upload()  {
         mainItemArr = realm.objects(Category.self)
     }
+    
 }
 
 

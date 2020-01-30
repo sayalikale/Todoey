@@ -9,9 +9,13 @@
 import UIKit
 import RealmSwift
 import SwipeCellKit
+import ChameleonFramework
+
 
 class TodoeyListController: SwipeTableViewController {
     
+    @IBOutlet var addbtn: UIBarButtonItem!
+    @IBOutlet var searchbar: UISearchBar!
     //selected particular catagiry
     var realm = try! Realm()
     var selectedCategory : Category?
@@ -32,23 +36,46 @@ class TodoeyListController: SwipeTableViewController {
     
     //core data
     let appdelegate = UIApplication.shared.delegate as! AppDelegate
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+   
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.separatorStyle = .none
+        let colour = selectedCategory?.randomColour
+        addbtn.tintColor = ContrastColorOf(UIColor(hexString: colour!)!, returnFlat: true)
           tableView.rowHeight = 80
         //   let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        print("\(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))\n\n\n")
+        
         tableView.separatorColor = UIColor.red
         tableView.dataSource = self
         tableView.delegate = self
         tableView.tableFooterView = UIView()
         
         //selected particular catagiry
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
         
+        title = selectedCategory?.name
+        if let colour = selectedCategory?.randomColour
+        {
+            navigationController?.navigationBar.barStyle = .default
+            navigationController?.navigationBar.barTintColor = UIColor(hexString: colour)
+            navigationController?.navigationBar.tintColor = ContrastColorOf(UIColor(hexString: colour)!, returnFlat: true)
+            navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedStringKey.foregroundColor: ContrastColorOf(UIColor(hexString: colour)!, returnFlat: true)]
+
+            searchbar.barTintColor = UIColor(hexString: colour)
+
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        navigationController?.navigationBar.barTintColor = UIColor.flatSkyBlue
         
-        
+       // navigationController?.navigationBar.barTintColor = UIColor.flatWhite
+        navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.flatWhite]
+        navigationController?.navigationBar.tintColor = ContrastColorOf(UIColor.flatWhite, returnFlat: true)
     }
     
     //Mark : table view datasource
@@ -63,12 +90,26 @@ class TodoeyListController: SwipeTableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
-      
+        
         if(searchActive){
             cell.textLabel?.text = filtered?[indexPath.row].title ?? "Not found";
+            
+            if var colour = UIColor(hexString: (selectedCategory?.randomColour)!)?.darken(byPercentage: CGFloat(indexPath.row)/CGFloat((todoArray?.count)!))
+            {
+               // cell.backgroundColor = colour
+               // cell.textLabel?.textColor = ContrastColorOf(colour, returnFlat: true)
+                cell.tintColor = ContrastColorOf(colour, returnFlat: true)
+            }
             cell.accessoryType = filtered?[indexPath.row].done == true ? .checkmark : .none
         } else {
             cell.textLabel?.text = todoArray?[indexPath.row].title ?? "no item added yet";
+             if var colour = UIColor(hexString: (selectedCategory?.randomColour)!)?.darken(byPercentage: CGFloat(indexPath.row)/CGFloat((todoArray?.count)!))
+            {
+                cell.backgroundColor = colour
+                cell.textLabel?.textColor = ContrastColorOf(colour, returnFlat: true)
+                cell.tintColor = ContrastColorOf(colour, returnFlat: true)
+            }
+            
             cell.accessoryType = todoArray?[indexPath.row].done == true ? .checkmark : .none
         }
         
@@ -77,9 +118,7 @@ class TodoeyListController: SwipeTableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let cell = tableView.cellForRow(at: indexPath as IndexPath) {
-            print("row \(indexPath.row)")
             
-          
             if(!searchActive){
                 if let item = todoArray?[indexPath.row]
                 {
@@ -190,7 +229,7 @@ class TodoeyListController: SwipeTableViewController {
         let alert = UIAlertController(title: "Add item", message: "Add new item in your todo list", preferredStyle: .alert)
         
         let action = UIAlertAction(title: "Add", style: .default) { (newitemtext) in
-            print("item \(textfiled.text ?? "")")
+        
             if textfiled.text == "" as String?
             {
                 let alert = UIAlertController(title: "Add item", message: "please write a item name", preferredStyle: .alert)
@@ -211,6 +250,7 @@ class TodoeyListController: SwipeTableViewController {
                             let newItem = Item()
                             newItem.title = textfiled.text!
                             newItem.done = false
+                            newItem.colour = UIColor.randomFlat.hexValue()
                             curentitem.item.append(newItem)
                         }
                     }
@@ -220,7 +260,7 @@ class TodoeyListController: SwipeTableViewController {
                     }
                 }
                 self.searchActive = false;
-                print("searchActive \(self.searchActive)")
+             
                 self.tableView.reloadData()
                 
                 
@@ -264,7 +304,7 @@ extension TodoeyListController : UISearchBarDelegate
         searchActive = false;
         searchBar.text = ""
         tableView.reloadData()
-        print("sayalikale")
+      
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {

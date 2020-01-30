@@ -50,6 +50,8 @@
                     </navigationItem>
                     <connections>
                         <outlet property="TodoSearchbar" destination="T9f-oc-8st" id="icz-kz-VPQ"/>
+                        <outlet property="addbtn" destination="l3W-fv-SEd" id="Vum-Vs-skd"/>
+                        <outlet property="searchbar" destination="T9f-oc-8st" id="nUq-5I-J8u"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="FD8-WN-9Ax" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -61,8 +63,8 @@
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="gig-or-MjF" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="aHD-2L-0yz">
-                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="aHD-2L-0yz">
+                        <rect key="frame" x="0.0" y="20" width="375" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="barTintColor" red="0.4972779081" green="0.74722478469999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <textAttributes key="titleTextAttributes">
@@ -78,7 +80,7 @@
             </objects>
             <point key="canvasLocation" x="344.80000000000001" y="-296.40179910044981"/>
         </scene>
-        <!--Todoey-->
+        <!--Home-->
         <scene sceneID="Yfq-W6-Bqz">
             <objects>
                 <tableViewController id="hEy-YV-gd3" customClass="CategoryViewController" customModule="Todoey" customModuleProvider="target" sceneMemberID="viewController">
@@ -101,7 +103,7 @@
                             <outlet property="delegate" destination="hEy-YV-gd3" id="gOe-1v-tt2"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Todoey" id="z23-mm-rgh">
+                    <navigationItem key="navigationItem" title="Home" id="z23-mm-rgh">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="NDx-uw-2j2">
                             <color key="tintColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
